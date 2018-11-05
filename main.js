@@ -37,11 +37,30 @@ app.post('/login', (req, res, next) => {
     } else {
       res.cookie('authorization', token, { path: '/', secure: false, httpOnly: true });
       res.send({
-        height,
-        width
+        colors: {
+          r, g, b
+        },
+        dimension: {
+          height,
+          width
+        }
       })    
     }
   });
+})
+
+app.get('/points', (req, res) => {
+  GameOfLifeService.getAll().then((data)=>{
+    var obj = {}
+    for (var i in data) {
+      var [x, y, z] = i.split(":")
+      obj[`${x}:${y}`] = {
+        ...obj[`${x}:${y}`],
+        [z]: data[i]
+      }
+    }
+    res.send(obj)
+  })
 })
 
 app.use(jwtMiddleware({
@@ -65,9 +84,14 @@ app.post('/token/extend', (req, res, next)=>{
     } else {
       res.cookie('authorization', token, { path: '/', secure: false, httpOnly: true });
       res.send({
-        height,
-        width
-      })    
+        colors: {
+          r, g, b
+        },
+        dimension: {
+          height,
+          width
+        }
+      })        
     }
   });
 
@@ -84,9 +108,11 @@ app.post('/points', [
   body('points.$.y').exists(),
   body('points.$.y').isInt(),
   body('points.$.y', 'range').custom(value => value >=0 && value < height)
-], (req, res) => {
+], (req, res, next) => {
   const { r, g, b } = req.user
   const { points } = req.body
+  console.log(r, g, b)
+  console.log(points)
   GameOfLifeService.addPoints(points, {
     r, g, b
   }).then(()=>{
@@ -96,8 +122,30 @@ app.post('/points', [
   })
 })
 
+
 app.use((err, req, res, next) => {
+  console.log(err)
   res.status(err.status || 500).send(err.name)
 })
 
 server.listen(process.env.PORT || 5000);
+
+GameOfLifeService.initSubscriber()
+
+GameOfLifeService.events().on("data", ()=>{
+  console.log('new data')
+  GameOfLifeService.getAll().then((data)=>{
+    var obj = {}
+    for (var i in data) {
+      var [x, y, z] = i.split(":")
+      obj[`${x}:${y}`] = {
+        ...obj[`${x}:${y}`],
+        [z]: data[i]
+      }
+    }
+    return obj
+  }).then((obj)=>{
+    console.log(obj)
+    io.emit('data', obj)
+  })
+})
