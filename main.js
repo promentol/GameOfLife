@@ -23,12 +23,13 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', (req, res, next) => {
-  const payload = {
+  const colors = {
     r: parseInt(256*Math.random()),
     g: parseInt(256*Math.random()),
     b: parseInt(256*Math.random()),
   }
-  jwt.sign(payload, secret, {
+  console.log(colors)
+  jwt.sign(colors, secret, {
     expiresIn: "7 days"
   }, (err, token) => {
     if(err) {
@@ -37,9 +38,7 @@ app.post('/login', (req, res, next) => {
     } else {
       res.cookie('authorization', token, { path: '/', secure: false, httpOnly: true });
       res.send({
-        colors: {
-          r, g, b
-        },
+        colors,
         dimension: {
           height,
           width

@@ -3,13 +3,12 @@ require('bluebird').promisifyAll(redis);
 const { EventEmitter } = require('events');
 const fs = require('fs')
 
+const client = redis.createClient(process.env.REDIS || 'redis://:asd@192.241.170.147:36379')
+const prefix = process.env.REDIS_PREFIX || ""
+
 const TABLE_NAME = `${prefix}_GAMEOFLIFE_DATA`
 const QUEUE_NAME = `${prefix}_GAMEOFLIFE_QUEUE`
 const CHANNEL_NAME = `${prefix}_GAMEOFLIFE_CHANNEL`
-
-
-const client = redis.createClient(process.env.REDIS)
-const prefix = process.env.REDIS_PREFIX || ""
 
 client.on("error", function (err) {
     console.log("Error " + err);
@@ -27,7 +26,7 @@ exports.iterate = (height, width) =>  client.evalAsync(fs.readFileSync('../lua/i
 
 exports.getAll = () => client.hgetallAsync(TABLE_NAME)
 
-clientSubscriber = redis.createClient(process.env.REDIS)
+clientSubscriber = redis.createClient(process.env.REDIS || 'redis://:asd@192.241.170.147:36379')
 
 exports.initSubscriber = () => clientSubscriber.subscribe(CHANNEL_NAME)
 
