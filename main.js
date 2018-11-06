@@ -10,8 +10,8 @@ const jwt = require('jsonwebtoken');
 const GameOfLifeService = require('./services/GameOfLifeService')
 
 const secret = process.env.SECRET || 'asd'
-const height = process.env.HEIGHT || 250
-const width = process.env.WIDTH || 400
+const height = process.env.HEIGHT || 20
+const width = process.env.WIDTH || 50
 
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -103,12 +103,13 @@ app.post('/points', [
   body('points').isArray(),
   body('points.$.x').isInt(),
   body('points.$.x').exists(),
-  body('points.$.x', 'range').custom(value => value >=0 && value < width),
+  body('points.$.x', 'range').custom(value => value >=0 && value < height),
   body('points.$.y').exists(),
   body('points.$.y').isInt(),
-  body('points.$.y', 'range').custom(value => value >=0 && value < height)
+  body('points.$.y', 'range').custom(value => value >=0 && value < width)
 ], (req, res, next) => {
   const { r, g, b } = req.user
+  console.log(req.body)
   const { points } = req.body
   console.log(r, g, b)
   console.log(points)
@@ -134,17 +135,28 @@ GameOfLifeService.initSubscriber()
 GameOfLifeService.events().on("data", ()=>{
   console.log('new data')
   GameOfLifeService.getAll().then((data)=>{
-    var obj = {}
-    for (var i in data) {
-      var [x, y, z] = i.split(":")
-      obj[`${x}:${y}`] = {
-        ...obj[`${x}:${y}`],
-        [z]: data[i]
-      }
-    }
-    return obj
+    return formatData(data)
   }).then((obj)=>{
-    console.log(obj)
     io.emit('data', obj)
   })
 })
+
+io.on('connection', (socket) => {
+  GameOfLifeService.getAll().then((data)=>{
+    return formatData(data)
+  }).then((obj)=>{
+    socket.emit('data', obj)
+  })
+})
+
+function formatData (data) {
+  var obj = {}
+  for (var i in data) {
+    var [x, y, z] = i.split(":")
+    obj[`${x}:${y}`] = {
+      ...obj[`${x}:${y}`],
+      [z]: data[i]
+    }
+  }
+  return obj
+}

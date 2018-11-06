@@ -19,6 +19,5 @@
 
 
 .game td:hover {
-    background-color: red;
     opacity: 0.8;
 }

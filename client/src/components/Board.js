@@ -3,11 +3,32 @@ import io from 'socket.io-client';
 import { placePoints } from '../utils'
 
 class Board extends Component {
+    state = {
+        data: {}
+    }
+    componentDidMount() {
+        this.socket = io('localhost:5000');
+        this.socket.on('data', (data) => {
+            this.setState({
+                data
+            })
+        });
+    }
     generateArray = (N) => {
         return Array.apply(null, {length: N}).map(Number.call, Number)
     }
     placePoint = (x, y) => {
-        placePoints([{x, y}]) 
+        placePoints([{x, y}])
+        this.setState({
+            data: {
+                ...this.state.data,
+                [`${x}:${y}`]: {
+                    r: this.props.colors.r,
+                    g: this.props.colors.g,
+                    b: this.props.colors.b
+                }
+            }
+        })
     }
     render() {
         const heightArray = this.generateArray(this.props.dimension.height)
@@ -20,7 +41,9 @@ class Board extends Component {
                         return (
                             <tr key={x}>
                                 {widthArray.map((y) => {
-                                    return <td onClick={()=>this.placePoint(x, y)} key={y}></td>
+                                    const colorString = this.state.data[`${x}:${y}`]
+                                    const backgroundColor = colorString ? `rgb(${colorString.r},${colorString.g},${colorString.b})` : ''
+                                    return <td style={{backgroundColor}} onClick={()=>this.placePoint(x, y)} key={y}></td>
                                 })}
                             </tr>
                         )
