@@ -1,0 +1,24 @@
+.game{
+    border: 0;
+    table-layout: fixed;
+    width: 10px;
+    border-spacing: 0px;
+    border-collapse: separate;
+}
+
+.game th, .game td {
+    border: 0;
+    width: 10px;
+    height: 10px;
+}
+
+.game td {
+    padding: 0px;
+}
+
+
+
+.game td:hover {
+    background-color: red;
+    opacity: 0.8;
+}
