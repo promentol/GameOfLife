@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
 import Board from './Board'
+import { placePoints } from '../utils'
 const patterns = require('../patterns.json')
 
-console.log(patterns)
 
 class GameOfLife extends Component {
     placeRandom = (pattern) => {
-        const A = parseInt(height*Math.random())
-        const B = parseInt(width*Math.random())
-        fetch('/point', {
-            method: 'POST',
-            body: {
-                points: pattern.points.map(({x, y}) => {
-                    return {
-                        x: x+A,
-                        y: y+B
-                    }
-                })
+        const A = parseInt(this.props.dimension.height*Math.random())
+        const B = parseInt(this.props.dimension.width*Math.random())
+        placePoints(pattern.locations.map(({x, y})=>{
+            return {
+                x: x+A,
+                y: y+B
             }
-        })
+        }))
     }
+
     render() {
         return (
             <React.Fragment>

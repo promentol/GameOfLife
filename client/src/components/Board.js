@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+import { placePoints } from '../utils'
 
 class Board extends Component {
     generateArray = (N) => {
         return Array.apply(null, {length: N}).map(Number.call, Number)
+    }
+    placePoint = (x, y) => {
+        placePoints([{x, y}]) 
     }
     render() {
         const heightArray = this.generateArray(this.props.dimension.height)
