@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { placePoints } from '../utils'
+import {Helmet} from "react-helmet";
 
 class Board extends Component {
     state = {
@@ -50,6 +51,14 @@ class Board extends Component {
                     })}
                 </tbody>
                 </table>
+                <Helmet>
+                    <style>{
+                        `.game td:hover {
+                                background-color: rgb(${this.props.colors.r},${this.props.colors.g},${this.props.colors.b});
+                        }`}
+                    </style>
+                </Helmet>
+
             </div>
         )
     }
