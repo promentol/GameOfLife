@@ -7,7 +7,10 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const jwtMiddleware = require('express-jwt');
 const jwt = require('jsonwebtoken');
-const GameOfLifeService = require('./services/GameOfLifeService')
+const { GameOfLife, GameOfLifePublisher } = require('./services/GameOfLife')
+const redis = require('redis');
+require('bluebird').promisifyAll(redis);
+
 
 const secret = process.env.SECRET || 'asd'
 const height = process.env.HEIGHT || 20
@@ -49,15 +52,7 @@ app.post('/login', (req, res, next) => {
 })
 
 app.get('/points', (req, res) => {
-  GameOfLifeService.getAll().then((data)=>{
-    var obj = {}
-    for (var i in data) {
-      var [x, y, z] = i.split(":")
-      obj[`${x}:${y}`] = {
-        ...obj[`${x}:${y}`],
-        [z]: data[i]
-      }
-    }
+  gameOfLife.getAll().then((obj)=>{
     res.send(obj)
   })
 })
@@ -113,7 +108,7 @@ app.post('/points', [
   const { points } = req.body
   console.log(r, g, b)
   console.log(points)
-  GameOfLifeService.addPoints(points, {
+  gameOfLife.addPoints(points, {
     r, g, b
   }).then(()=>{
     res.send({})
@@ -130,33 +125,17 @@ app.use((err, req, res, next) => {
 
 server.listen(process.env.PORT || 5000);
 
-GameOfLifeService.initSubscriber()
+const gameOfLife = new GameOfLife(redis.createClient(process.env.REDIS_URL), process.env.prefix || "")
+const gameOfLifePublisher = new GameOfLifePublisher(redis.createClient(process.env.REDIS_URL), process.env.prefix || "")
 
-GameOfLifeService.events().on("data", ()=>{
-  console.log('new data')
-  GameOfLifeService.getAll().then((data)=>{
-    return formatData(data)
-  }).then((obj)=>{
+gameOfLifePublisher.events.on("data", ()=>{
+  gameOfLife.getAll().then((obj)=>{
     io.emit('data', obj)
   })
 })
 
 io.on('connection', (socket) => {
-  GameOfLifeService.getAll().then((data)=>{
-    return formatData(data)
-  }).then((obj)=>{
+  gameOfLife.getAll().then((obj)=>{
     socket.emit('data', obj)
   })
 })
-
-function formatData (data) {
-  var obj = {}
-  for (var i in data) {
-    var [x, y, z] = i.split(":")
-    obj[`${x}:${y}`] = {
-      ...obj[`${x}:${y}`],
-      [z]: data[i]
-    }
-  }
-  return obj
-}

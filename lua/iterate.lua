@@ -15,8 +15,8 @@ local neighbors = {
     {-1, 1},
 }
 
-for i=1,height do
-    for j=1,width do
+for i=0,height-1 do
+    for j=0,width-1 do
 
         local count = 0
         local sum_r = 0
@@ -27,7 +27,7 @@ for i=1,height do
         for k=1,8 do
             local x = i+neighbors[k][1]
             local y = j+neighbors[k][2]
-            if x >= 1 and x<=height and y>=1 and y<=width then
+            if x >= 0 and x<height and y>=0 and y<width then
                 local link_id = redis.call("HEXISTS", table, x..":"..y..":".."r")
                 if link_id == 1 then
                     count = count + 1
