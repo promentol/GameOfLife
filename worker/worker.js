@@ -9,9 +9,7 @@ const redisConnection = redis.createClient(process.env.REDIS_URL)
 
 const gameOfLife = new GameOfLife(redisConnection, process.env.prefix || "")
 
-gameOfLife.iterate(height, width).then(() => {
-    console.log("ITERATION COMPLETE")
-}).catch(e => {
+gameOfLife.iterate(height, width).catch(e => {
     console.log("ITERATION ERROR", e)
 }).then(() => {
     redisConnection.end(true)

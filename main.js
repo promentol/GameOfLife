@@ -31,12 +31,10 @@ app.post('/login', (req, res, next) => {
     g: parseInt(256*Math.random()),
     b: parseInt(256*Math.random()),
   }
-  console.log(colors)
   jwt.sign(colors, secret, {
     expiresIn: "7 days"
   }, (err, token) => {
     if(err) {
-      console.log(err)
       res.status(500).send({})
     } else {
       res.cookie('authorization', token, { path: '/', secure: false, httpOnly: true });
@@ -73,7 +71,6 @@ app.post('/token/extend', (req, res, next)=>{
     expiresIn: "7 days"
   }, (err, token) => {
     if(err) {
-      console.log(err)
       res.status(500).send({})
     } else {
       res.cookie('authorization', token, { path: '/', secure: false, httpOnly: true });
@@ -104,10 +101,7 @@ app.post('/points', [
   body('points.$.y', 'range').custom(value => value >=0 && value < width)
 ], (req, res, next) => {
   const { r, g, b } = req.user
-  console.log(req.body)
   const { points } = req.body
-  console.log(r, g, b)
-  console.log(points)
   gameOfLife.addPoints(points, {
     r, g, b
   }).then(()=>{
@@ -119,7 +113,6 @@ app.post('/points', [
 
 
 app.use((err, req, res, next) => {
-  console.log(err)
   res.status(err.status || 500).send(err.name)
 })
 
