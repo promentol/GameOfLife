@@ -35,7 +35,7 @@ class Board extends Component {
         const heightArray = this.generateArray(this.props.dimension.height)
         const widthArray = this.generateArray(this.props.dimension.width)
         return (
-            <div>
+            <div className="Board">
                 <table className="game">
                 <tbody>
                     {heightArray.map((x) => {

@@ -23,7 +23,7 @@ class GameOfLife extends Component {
         return (
             <React.Fragment>
                 <Board colors={this.props.colors} dimension={this.props.dimension} />
-                <div>
+                <div className="patterns">
                     {patterns.map((pattern) => {
                         return (
                             <div key={pattern.name} onClick={()=>this.placeRandom(pattern)}>
