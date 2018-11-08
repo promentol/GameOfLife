@@ -1,6 +1,7 @@
 const { EventEmitter } =require('events')
 
 const fs = require('fs')
+const path = require('path')
 
 class GameOfLife {
     constructor(redisClient, prefix) {
@@ -12,7 +13,7 @@ class GameOfLife {
     }
 
     iterate (height, width) {
-        return this.redisClient.evalAsync(fs.readFileSync('../lua/iterate.lua'), 3, this.TABLE_NAME, this.QUEUE_NAME, this.CHANNEL_NAME, height, width)
+        return this.redisClient.evalAsync(fs.readFileSync(path.join(__dirname, '../lua/iterate.lua')), 3, this.TABLE_NAME, this.QUEUE_NAME, this.CHANNEL_NAME, height, width)
     }
 
     addPoints (points, {
