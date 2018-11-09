@@ -8,7 +8,7 @@ class Board extends Component {
         data: {}
     }
     componentDidMount() {
-        this.socket = io('localhost:5000');
+        this.socket = io('');
         this.socket.on('data', (data) => {
             this.setState({
                 data
