@@ -34,6 +34,7 @@ $ npm start
 Port `5000` is used by default for http api server, and port `3000` is used for front end application serving.
 ### Environment variables
 The following environmental variables can be set
+
 | Variable | description | default value | 
 | ------ | ------ | ------ |
 | `REDIS_URL` | Url of `Redis` instance to connect | none / localhost |
