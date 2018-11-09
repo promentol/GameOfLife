@@ -43,7 +43,7 @@ class Board extends Component {
                             <tr key={x}>
                                 {widthArray.map((y) => {
                                     const colorString = this.state.data[`${x}:${y}`]
-                                    const backgroundColor = colorString ? `rgb(${colorString.r},${colorString.g},${colorString.b})` : ''
+                                    const backgroundColor = colorString ? `rgb(${parseInt(colorString.r)},${parseInt(colorString.g)},${parseInt(colorString.b)})` : ''
                                     return <td style={{backgroundColor}} onClick={()=>this.placePoint(x, y)} key={y}></td>
                                 })}
                             </tr>
